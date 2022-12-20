@@ -9,4 +9,6 @@ public interface OrderItemMapper {
     OrderItemDto toDTO(OrderItem orderItem);
 
     List<OrderItemDto> toDTOs(List<OrderItem> orderItem);
+
+    OrderItem toOrderItem(OrderItemDto orderItemDto);
 }

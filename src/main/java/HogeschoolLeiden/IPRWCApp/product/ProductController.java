@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin
 @Slf4j
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
     @Autowired
     private ProductService productService;
@@ -29,10 +29,10 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.getProductDto(productId));
     }
 
-    @PostMapping("/product/add")
-    public ResponseEntity<ProductDto> AddProduct(@RequestBody Product product) {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/product/add").toUriString());
-        return ResponseEntity.created(uri).body(productService.addProduct(product));
+    @PostMapping("/add")
+    public ResponseEntity<ProductDto> AddProduct(@RequestBody ProductDto productDto) {
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/products/add").toUriString());
+        return ResponseEntity.created(uri).body(productService.addProduct(productDto));
     }
 
     @DeleteMapping("/{productId}")
