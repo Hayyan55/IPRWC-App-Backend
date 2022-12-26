@@ -1,5 +1,6 @@
 package HogeschoolLeiden.IPRWCApp.orderItem;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -9,7 +10,7 @@ import java.util.List;
 @Repository
 public interface OrderItemRepo extends JpaRepository<OrderItem, Long> {
 
-    boolean existsById(Long id);
+    boolean existsById(@NotNull Long id);
 
     @Query(
             value =
