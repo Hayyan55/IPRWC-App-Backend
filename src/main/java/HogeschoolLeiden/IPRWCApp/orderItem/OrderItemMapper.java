@@ -5,10 +5,21 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface OrderItemMapper {
-    OrderItemDto toDTO(OrderItem orderItem);
+public abstract class OrderItemMapper {
+    abstract OrderItemDto toDTO(OrderItem orderItem);
 
-    List<OrderItemDto> toDTOs(List<OrderItem> orderItem);
+    abstract List<OrderItemDto> toDTOs(List<OrderItem> orderItem);
 
-    OrderItem toOrderItem(OrderItemDto orderItemDto);
+    public OrderItem toOrderItem(OrderItemDto orderItemDto) {
+        if ( orderItemDto == null ) {
+            return null;
+        }
+
+        OrderItem orderItem = new OrderItem();
+
+        orderItem.setQuantity( orderItemDto.getQuantity() );
+        orderItem.setCreatedAt( orderItemDto.getCreatedAt() );
+
+        return orderItem;
+    }
 }

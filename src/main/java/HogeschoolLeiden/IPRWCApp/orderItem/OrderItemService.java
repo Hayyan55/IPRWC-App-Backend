@@ -1,5 +1,9 @@
 package HogeschoolLeiden.IPRWCApp.orderItem;
 
+import HogeschoolLeiden.IPRWCApp.product.Product;
+import HogeschoolLeiden.IPRWCApp.product.ProductRepo;
+import HogeschoolLeiden.IPRWCApp.user.AppUser;
+import HogeschoolLeiden.IPRWCApp.user.UserRepo;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -18,20 +23,56 @@ import java.util.List;
 @Slf4j
 public class OrderItemService {
     @Autowired
+    private ProductRepo productRepo;
+    @Autowired
+    private UserRepo userRepo;
+    @Autowired
     private OrderItemRepo orderItemRepo;
+    @Autowired
+    private OrderItemMapper orderItemMapper;
 
-    private OrderItemMapper orderItemMapper = new OrderItemMapperImpl();
-
-    public OrderItemDto addOrderItemToCart(OrderItem orderItem) {
-        log.info("Saving new Order-Item: {} to the database.", orderItem.getProduct().getProductName());
-        if (orderItem.getProduct().getProductName() != null) {
-            orderItemRepo.save(orderItem);
+    public OrderItemDto addProductToCart(OrderItemDto orderItemDto) {
+        OrderItem orderItem = orderItemMapper.toOrderItem(orderItemDto);
+        Product product = productRepo.findProductById(orderItemDto.getProduct().getProductId());
+        AppUser appUser = userRepo.findAppUserById(orderItemDto.getAppUser().getId());
+        if (product != null && appUser != null) {
+            orderItem.setProduct(product);
+            orderItem.setAppUser(appUser);
+        }
+        log.info("Saving new Order-Item: {} to the database.", orderItem.getProduct().getId());
+        if (orderItem.getProduct().getId() != null) {
+            if (!orderItemRepo.findAllByAppUserAndProduct(orderItem.getAppUser().getId(), orderItem.getProduct().getId()).isEmpty()) {
+                this.incrementExistingItemQuantity(orderItem);
+            } else {
+                orderItemRepo.save(orderItem);
+            }
             return orderItemMapper.toDTO(orderItem);
         }
         throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Order-Item with order-id: " + orderItem.getId() + " doesn't exist between products."
         );
+    }
+
+    private void incrementExistingItemQuantity(OrderItem orderItem) {
+        List<OrderItem> listOrders = orderItemRepo.findAllByAppUserAndProduct(orderItem.getAppUser().getId(), orderItem.getProduct().getId());
+        for (OrderItem existingItem: listOrders) {
+            if (orderItem.getProduct().getId().equals(existingItem.getProduct().getId())) {
+                existingItem.setQuantity(
+                        existingItem.getQuantity() + orderItem.getQuantity()
+                );
+            }
+        }
+    }
+
+    public float getTotal(Long userId) {
+        List<OrderItem> listOrders = orderItemRepo.findAllByAppUser(userId);
+        float total = 0.0f;
+        for (OrderItem orderItem : listOrders){
+            int totalProduct = orderItem.getProduct().getProductPrise() * orderItem.getQuantity();
+            total += totalProduct;
+        }
+        return total;
     }
 
     public List<OrderItemDto> getAllOrderItemsDto() {

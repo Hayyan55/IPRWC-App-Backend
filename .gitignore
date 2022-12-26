@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+### Classes ###
+\src\main\java\HogeschoolLeiden\IPRWCApp\Roles.java

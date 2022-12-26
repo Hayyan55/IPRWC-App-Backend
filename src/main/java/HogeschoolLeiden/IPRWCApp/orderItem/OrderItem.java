@@ -1,7 +1,7 @@
 package HogeschoolLeiden.IPRWCApp.orderItem;
 
-import HogeschoolLeiden.IPRWCApp.order.Order;
 import HogeschoolLeiden.IPRWCApp.product.Product;
+import HogeschoolLeiden.IPRWCApp.user.AppUser;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "ORDER_ITEM")
+@Table(name = "order_item")
 @Data
 @Builder
 @NoArgsConstructor
@@ -31,10 +31,11 @@ public class OrderItem {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private Date updatedAt;
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order orderCart;
+//    @UpdateTimestamp
+//    @Column(name = "updated_at")
+//    private Date updatedAt;
+
+    @ManyToOne()
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private AppUser appUser;
 }

@@ -21,23 +21,20 @@ public class ProductService {
 
     @Autowired
     private ProductRepo productRepo;
-    private ProductMapper productMapper = new ProductMapperImpl();
+    @Autowired
+    private ProductMapper productMapper;
 
-    public ProductDto addProduct(Product product) {
-        log.info("Saving new Product: {} to the database.", product.getProductName());
-        if (!productRepo.existsByProductName(product.getProductName())) {
-            product =Product.builder()
-                    .productName(product.getProductName())
-                    .productPhoto(product.getProductPhoto())
-                    .productPrise(product.getProductPrise())
-                    .productDescription(product.getProductDescription())
-                    .build();
+    public ProductDto addProduct(ProductDto productDto) {
+        log.info("Saving new Product: {} to the database.", productDto.getProductName());
+        String productName = productDto.getProductName();
+        if (!productRepo.existsByProductName(productName)) {
+            Product product = productMapper.toProduct(productDto);
             productRepo.save(product);
             return productMapper.toDTO(product);
         }
         throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
-                "Product with product id: " + product.getId() + " already exists"
+                "Product with product id: " + productDto.getProductName() + " already exists"
         );
     }
 
@@ -52,7 +49,7 @@ public class ProductService {
         return productMapper.toDTO(product);
     }
 
-    public Product getProduct(Long id) {
+    private Product getProduct(Long id) {
         return productRepo.findById(id).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND)
         );

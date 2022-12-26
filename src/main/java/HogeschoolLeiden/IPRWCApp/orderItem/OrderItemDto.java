@@ -1,13 +1,10 @@
 package HogeschoolLeiden.IPRWCApp.orderItem;
 
-import HogeschoolLeiden.IPRWCApp.order.Order;
 import HogeschoolLeiden.IPRWCApp.product.ProductDto;
-import lombok.Data;
+import HogeschoolLeiden.IPRWCApp.user.AppUser;
 import lombok.Getter;
 import lombok.Setter;
-import org.mapstruct.Mapper;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -16,10 +13,10 @@ import java.util.Date;
 @Getter
 @Setter
 public class OrderItemDto {
-    private Long id;
+//    private Long id;
     private ProductDto product;
     private int quantity;
     private Date createdAt;
     private Date updatedAt;
-    private Order orderCart;
+    private AppUser appUser;
 }
