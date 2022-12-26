@@ -10,5 +10,4 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
     boolean existsByProductName(String productName);
     Product findProductById(Long productId);
 //    Product findProductByProductName(String productName);
-//    void deleteProductByIdAndProductName(Long productId, String productName);
 }
