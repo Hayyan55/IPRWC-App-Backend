@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @Slf4j
 @RequestMapping("/products")
 public class ProductController {

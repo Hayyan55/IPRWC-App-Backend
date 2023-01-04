@@ -1,6 +1,5 @@
 package HogeschoolLeiden.IPRWCApp.user;
 
-import HogeschoolLeiden.IPRWCApp.user.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +72,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new UsernameNotFoundException("user not found in the database");
         } else {
             log.info("user: {} found in the database", username);
+            log.info("user: {} found in the database", user.getRoles());
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role -> {
