@@ -33,7 +33,7 @@ public class OrderItemService {
     public OrderItemDto addProductToCart(OrderItemDto orderItemDto) {
         OrderItem orderItem = orderItemMapper.toOrderItem(orderItemDto);
         Product product = productRepo.findProductById(orderItemDto.getProduct().getProductId());
-        AppUser appUser = userRepo.findAppUserById(orderItemDto.getAppUser().getId());
+        AppUser appUser = userRepo.findByUsername(orderItemDto.getAppUser().getUsername());
         if (product != null && appUser != null) {
             orderItem.setProduct(product);
             orderItem.setAppUser(appUser);
