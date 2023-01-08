@@ -40,11 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll();
         http.authorizeRequests().antMatchers("/login/**", "/token/refresh/**", "/order_baskets/add").permitAll();
-        http.authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority(ADMIN);
+        http.authorizeRequests().antMatchers(GET, "/api/users/**").hasAnyAuthority(SUPER_ADMIN);
         http.authorizeRequests().antMatchers(GET, "/api/**").hasAnyAuthority(ADMIN, SUPER_ADMIN);
         http.authorizeRequests().antMatchers(DELETE, "/api/**").hasAnyAuthority(ADMIN, SUPER_ADMIN);
         http.authorizeRequests().antMatchers(POST, "/api/user/save/**").hasAnyAuthority(ADMIN, SUPER_ADMIN);
-        http.authorizeRequests().antMatchers(POST, "/products/add/**").hasAnyAuthority(ADMIN, MANAGER);
+        http.authorizeRequests().antMatchers(POST, "/products/add/**").hasAnyAuthority(ADMIN, SUPER_ADMIN);
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

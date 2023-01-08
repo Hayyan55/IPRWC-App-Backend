@@ -20,9 +20,9 @@ public class OrderItemController {
     @Autowired
     OrderItemService orderItemService;
 
-    @GetMapping("")
-    public ResponseEntity<List<OrderItemDto>> getAllOrderItems() {
-        return ResponseEntity.ok().body(orderItemService.getAllOrderItemsDto());
+    @GetMapping("/{username}/all")
+    public ResponseEntity<List<OrderItemDto>> getAllOrderItems(@PathVariable String username) {
+        return ResponseEntity.ok().body(orderItemService.getAllOrderItemsDto(username));
     }
 
     @GetMapping("/{itemId}")
@@ -36,14 +36,20 @@ public class OrderItemController {
         return ResponseEntity.created(uri).body(orderItemService.addProductToCart(orderItemDto));
     }
 
-    @GetMapping("/order-item/{userId}/total")
-    public ResponseEntity<Float> getTotal(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(orderItemService.getTotal(userId));
+    @GetMapping("/order-item/{username}/total")
+    public ResponseEntity<Float> getTotal(@PathVariable String username) {
+        return ResponseEntity.ok().body(orderItemService.getTotal(username));
     }
 
-    @DeleteMapping("/{itemId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable long itemId) {
-        orderItemService.deleteOrderItem(itemId);
+    @DeleteMapping("/{username}/delete/{productName}")
+    public ResponseEntity<Void> deleteOrderItem(@PathVariable String username, @PathVariable String productName) {
+        orderItemService.deleteOrderItem(username, productName);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{username}/submit")
+    public ResponseEntity<Void> SubmitAllItems(@PathVariable String username) {
+        orderItemService.submitAll(username);
         return ResponseEntity.ok().build();
     }
 }

@@ -21,6 +21,15 @@ public interface OrderItemRepo extends JpaRepository<OrderItem, Long> {
                             + "ORDER BY created_at DESC ",
             nativeQuery = true)
     List<OrderItem> findAllByAppUserAndProduct(Long userId, Long productId);
+    @Query(
+            value =
+                    "SELECT   * "
+                            + "FROM      order_item oi "
+                            + "WHERE    oi.user_id = ?1 "
+                            + "AND      oi.product = ?2 "
+                            + "ORDER BY created_at DESC ",
+            nativeQuery = true)
+    OrderItem findByAppUserAndProduct(Long userId, Long productId);
 
     @Query(
             value =

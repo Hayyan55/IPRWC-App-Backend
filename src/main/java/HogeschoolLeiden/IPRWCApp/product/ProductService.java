@@ -1,6 +1,8 @@
 package HogeschoolLeiden.IPRWCApp.product;
 
 
+import HogeschoolLeiden.IPRWCApp.user.AppUser;
+import HogeschoolLeiden.IPRWCApp.user.UserRepo;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,8 @@ public class ProductService {
 
     @Autowired
     private ProductRepo productRepo;
+    @Autowired
+    private UserRepo userRepo;
     @Autowired
     private ProductMapper productMapper;
 
@@ -55,11 +59,25 @@ public class ProductService {
         );
     }
 
-    public void deleteProduct(Long id) {
-        if (!productRepo.existsById(id)) {
+    public void deleteProduct(String username, String productName) {
+        AppUser user = userRepo.findByUsername(username);
+        Product product = productRepo.findByProductName(productName);
+        if (user == null || !productRepo.existsById(product.getId())) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "No product found with id: " + id);
+                    HttpStatus.BAD_REQUEST, "No product found with id: " + product.getId());
         }
-        productRepo.deleteById(id);
+        productRepo.deleteById(product.getId());
+    }
+
+    public ProductDto updateProduct(String productName, ProductDto productDto) {
+        if (!productRepo.existsByProductName(productName)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No product found with id: " + productName);
+        }
+        Product product = productRepo.findByProductName(productName);
+        product.setProductName(productDto.getProductName());
+        product.setProductPrise(productDto.getProductPrise());
+        product.setProductDescription(productDto.getProductDescription());
+        return productMapper.toDTO(product);
     }
 }

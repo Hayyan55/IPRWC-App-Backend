@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Slf4j
+@CrossOrigin
 public class OrderItemService {
     @Autowired
     private ProductRepo productRepo;
@@ -32,8 +34,8 @@ public class OrderItemService {
 
     public OrderItemDto addProductToCart(OrderItemDto orderItemDto) {
         OrderItem orderItem = orderItemMapper.toOrderItem(orderItemDto);
-        Product product = productRepo.findProductById(orderItemDto.getProduct().getProductId());
-        AppUser appUser = userRepo.findByUsername(orderItemDto.getAppUser().getUsername());
+        Product product = productRepo.findByProductName(orderItemDto.getProduct().getProductName());
+        AppUser appUser = userRepo.findByUsername(orderItemDto.getUsername());
         if (product != null && appUser != null) {
             orderItem.setProduct(product);
             orderItem.setAppUser(appUser);
@@ -64,7 +66,9 @@ public class OrderItemService {
         }
     }
 
-    public float getTotal(Long userId) {
+    public float getTotal(String username) {
+        AppUser user = userRepo.findByUsername(username);
+        Long userId = user.getId();
         List<OrderItem> listOrders = orderItemRepo.findAllByAppUser(userId);
         float total = 0.0f;
         for (OrderItem orderItem : listOrders){
@@ -74,10 +78,16 @@ public class OrderItemService {
         return total;
     }
 
-    public List<OrderItemDto> getAllOrderItemsDto() {
-        List<OrderItem> orderItemList = orderItemRepo.findAll();
-        log.info(orderItemList.toString());
-        return orderItemMapper.toDTOs(orderItemList);
+    public List<OrderItemDto> getAllOrderItemsDto(String username) {
+        AppUser user = userRepo.findByUsername(username);
+        Long userId = user.getId();
+        if (userId != null) {
+            List<OrderItem> orderItemList = orderItemRepo.findAllByAppUser(userId);
+            log.info(orderItemList.toString());
+            return orderItemMapper.toDTOs(orderItemList);
+        } else {
+            throw new NullPointerException();
+        }
     }
 
     public OrderItemDto getOrderItemDto(Long id) {
@@ -91,11 +101,27 @@ public class OrderItemService {
         );
     }
 
-    public void deleteOrderItem(Long id){
-        if (!orderItemRepo.existsById(id)) {
+    public void deleteOrderItem(String username, String productName) {
+        AppUser user = userRepo.findByUsername(username);
+        Product product = productRepo.findByProductName(productName);
+        OrderItem orderItem = orderItemRepo.findByAppUserAndProduct(user.getId(), product.getId());
+        if (!orderItemRepo.existsById(orderItem.getId())) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "No OrderItem found with id: " + id);
+                    HttpStatus.BAD_REQUEST, "No OrderItem found with id: " + orderItem.getId());
         }
-        orderItemRepo.deleteById(id);
+        orderItemRepo.deleteById(orderItem.getId());
+    }
+
+    public void submitAll(String username) {
+        Long userId = userRepo.findByUsername(username).getId();
+        List<OrderItem> orderItems = orderItemRepo.findAllByAppUser(userId);
+        if (orderItems == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No product found with id: " + userId);
+        }
+        for (OrderItem item : orderItems) {
+            orderItemRepo.deleteById(item.getId());
+            log.info("has been deleted {} of the owner {}", item.getProduct().getProductName(), item.getAppUser().getUsername());
+        }
     }
 }
