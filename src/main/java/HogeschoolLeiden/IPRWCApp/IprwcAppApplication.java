@@ -14,8 +14,6 @@ public class IprwcAppApplication {
 		SpringApplication.run(IprwcAppApplication.class, args);
 	}
 
-
-
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
